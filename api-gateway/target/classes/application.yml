@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # Anything hitting /api/order/** on the gateway gets forwarded to
+        # order-service, with just "/api" stripped off first (StripPrefix=1),
+        # so /api/order/place -> /order/place on order-service, matching its
+        # real @GetMapping("/order/place"). The "lb://" scheme (not "http://")
+        # is what tells the gateway "resolve this name via Eureka + load
+        # balancer", exactly like @LoadBalanced RestTemplate did internally
+        # for order-service -> product-service.
+        - id: order-service-route
+          uri: lb://order-service
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=1
+
+        - id: product-service-route
+          uri: lb://product-service
+          predicates:
+            - Path=/api/products/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO

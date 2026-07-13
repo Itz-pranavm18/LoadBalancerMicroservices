@@ -1,0 +1,22 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  client:
+    # This IS the registry, so it doesn't need to register with itself
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    # In a real prod setup you'd leave this default (true) for self-preservation.
+    # Turned off here so the demo dashboard updates instantly when you kill an instance.
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
+
+logging:
+  level:
+    com.netflix.eureka: WARN
+    com.netflix.discovery: WARN
